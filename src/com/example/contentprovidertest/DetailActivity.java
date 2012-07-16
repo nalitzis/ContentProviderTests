@@ -36,7 +36,7 @@ public class DetailActivity extends FragmentActivity {
         Contacts.CONTACT_PRESENCE,
         Contacts.PHOTO_ID,
         Contacts.LOOKUP_KEY,
-       
+        Contacts.HAS_PHONE_NUMBER,
     };
 	
 	public void onCreate(Bundle savedInstanceState){
@@ -56,14 +56,15 @@ public class DetailActivity extends FragmentActivity {
 
 		 private String loadPhoneNumber(ContentResolver cr, long id){
 			 String number = "";
-			 //NOT WORKING
-//			 Uri photoUri = ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, id);
-//		     Cursor c = cr.query(photoUri, new String[] {ContactsContract.PhoneLookup.NUMBER}, null, null, null);
-//		     
-//		         if (c.moveToFirst()) 
-//		        	 number = c.getString(0);
-//
-//		     c.close();
+			 
+			 Cursor phones = getContentResolver().query( ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id, null, null); 
+		      if (phones.moveToFirst()) { 
+		    	  number = phones.getString(phones.getColumnIndex( ContactsContract.CommonDataKinds.Phone.NUMBER));                 
+		      } 
+		   phones.close(); 
+		   
+		   
+
 		     return number;
 		 }
 		 
@@ -114,9 +115,17 @@ public class DetailActivity extends FragmentActivity {
 					int statusIdx = c.getColumnIndex(Contacts.CONTACT_STATUS);
 					int photoIdIdx = c.getColumnIndex(Contacts.PHOTO_ID);
 					Bitmap bmp = loadContactPhoto(getContentResolver(), c.getInt(idIdx), c.getInt(photoIdIdx));
-					String phone = loadPhoneNumber(getContentResolver(), c.getInt(idIdx));
+					String hasPhone = c.getString(c.getColumnIndex(Contacts.HAS_PHONE_NUMBER)); 
+					String phone = "";
+					if (Boolean.parseBoolean(hasPhone)) { 
+						 phone = loadPhoneNumber(getContentResolver(), c.getInt(idIdx));
+						 phoneValue.setText(phone);
+					}  
 					
-					phoneValue.setText(phone);
+					
+					
+					
+					
 					statusValue.setText(c.getString(statusIdx));
 					image.setImageBitmap(bmp);
 					
