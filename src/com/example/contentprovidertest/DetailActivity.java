@@ -24,7 +24,7 @@ public class DetailActivity extends FragmentActivity {
 
 	public static final String INTENT_URI = "INTENT_URI";
 	
-	private TextView phoneValue, statusValue;
+	private TextView phoneValue, statusValue, nTimesContacted;
 	private ImageView image;
 	
 	private Uri uri;
@@ -37,6 +37,7 @@ public class DetailActivity extends FragmentActivity {
         Contacts.PHOTO_ID,
         Contacts.LOOKUP_KEY,
         Contacts.HAS_PHONE_NUMBER,
+        Contacts.TIMES_CONTACTED,
     };
 	
 	public void onCreate(Bundle savedInstanceState){
@@ -47,6 +48,7 @@ public class DetailActivity extends FragmentActivity {
 		setContentView(R.layout.activity_detail);
 		phoneValue = (TextView)this.findViewById(R.id.textView1);
 		statusValue = (TextView)this.findViewById(R.id.textView3);
+		nTimesContacted = (TextView)this.findViewById(R.id.textviewLastTime);
 		image = (ImageView)this.findViewById(R.id.imageView1);
 		
 		getSupportLoaderManager().initLoader(0, null, new MyLoaderCallbacks());
@@ -116,16 +118,10 @@ public class DetailActivity extends FragmentActivity {
 					int photoIdIdx = c.getColumnIndex(Contacts.PHOTO_ID);
 					Bitmap bmp = loadContactPhoto(getContentResolver(), c.getInt(idIdx), c.getInt(photoIdIdx));
 					String hasPhone = c.getString(c.getColumnIndex(Contacts.HAS_PHONE_NUMBER)); 
-					String phone = "";
-					if (Boolean.parseBoolean(hasPhone)) { 
-						 phone = loadPhoneNumber(getContentResolver(), c.getInt(idIdx));
-						 phoneValue.setText(phone);
-					}  
-					
-					
-					
-					
-					
+					int timeContacted = c.getInt(c.getColumnIndex(Contacts.TIMES_CONTACTED));
+					String phone = loadPhoneNumber(getContentResolver(), c.getInt(idIdx));
+					phoneValue.setText(phone);
+					nTimesContacted.setText(""+timeContacted);
 					statusValue.setText(c.getString(statusIdx));
 					image.setImageBitmap(bmp);
 					
